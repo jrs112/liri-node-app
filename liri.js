@@ -2,11 +2,11 @@ var keys = require("./keys.js");
 var spotify = require('spotify');
 var Twitter = require('twitter');
 var request = require("request");
+var fs = require("fs");
 var nodeArgs = process.argv;
 var songSearch = "";
 var movieSearch = "";
 var rottenSearch= "";
-
 
 var client = new Twitter({
   consumer_key: keys.twitterKeys.consumer_key,
@@ -28,7 +28,7 @@ for (var i = 3; i < nodeArgs.length; i++) {
 
     songSearch += nodeArgs[i];
     movieSearch += nodeArgs[i];
-    rottenSearch = nodeArgs[i];
+    rottenSearch += nodeArgs[i];
 
   }
 }
@@ -78,7 +78,7 @@ if (process.argv[2] === "spotify-this-song"){
 }
 
 if (process.argv[2] === "movie-this") {
-     if(process.argv[3] != undefined) {
+    if(process.argv[3] != undefined) {
         var queryUrl = "http://www.omdbapi.com/?t=" + movieSearch + "&y=&plot=short&r=json";
         request(queryUrl, function(error, response, body) {
             if (!error && response.statusCode === 200) {
@@ -94,7 +94,7 @@ if (process.argv[2] === "movie-this") {
                 console.log("Rotten Tomatoes URL:" + JSON.parse(body).Website);
             }
         });
-     } else {
+    } else {
         var queryUrlTwo = "http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&r=json";
         request(queryUrlTwo, function(error, response, body) {
             if (!error && response.statusCode === 200) {
@@ -112,4 +112,33 @@ if (process.argv[2] === "movie-this") {
         });
 
      }
+}
+
+if (process.argv[2] === "do-what-it-says") {
+    fs.readFile("random.txt", "utf8", function(err, data) {
+        console.log(data);
+        var dataArr = data.split(",");
+        console.log(dataArr);
+        console.log(dataArr[0]);
+        console.log(dataArr[1]);
+        if (dataArr[0] === "spotify-this-song"){
+            if(dataArr[1] != undefined) {
+                spotify.search({ type: 'track', query: dataArr[1] }, function(err, data) {
+                    if ( err ) {
+                        console.log('Error occurred: ' + err);
+                        return;
+                    }
+                    for (var i = 0; i < data.tracks.items.length; i++) {
+                    console.log("The artist is " + data.tracks.items[i].artists[0].name);
+                    console.log("The name of the song is " + data.tracks.items[i].name);
+                    console.log("The preview url is " + data.tracks.items[i].preview_url);
+                    console.log("The name of the album is " + data.tracks.items[i].album.name);
+                    console.log("-------------");
+                    }
+                });
+            }
+        }
+
+    });
+
 }
