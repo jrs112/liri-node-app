@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/jrs112/liri-node-app#readme",
   "dependencies": {
+    "request": "^2.81.0",
+    "spotify": "^0.3.0",
     "twitter": "^1.7.0"
   }
 }
